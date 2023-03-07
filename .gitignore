@@ -1,5 +1,7 @@
 **/node_modules
 **/.vscode
+**/dist
+**/compare
 
 node_modules
 .DS_Store
