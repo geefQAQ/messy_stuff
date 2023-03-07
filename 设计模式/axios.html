@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+
+    const utils = {
+      extend(a, b, context) {
+        for(let key in b) {
+          if(b.hasOwnProperty(key)) {
+            if (typeof b[key] === 'function') {
+              console.log(key);
+              a[key] = b[key].bind(context)
+            } else {
+              a[key] = b[key]
+            }
+          }
+        }
+      }
+    }
+    const methods = ['get', 'post']
+    function Axios(config) {
+      this.config = config;
+    }
+    methods.forEach((method) => {
+      Axios.prototype[method] = function () {
+        console.log(`这是${method}`)
+      }
+    })
+    Axios.prototype.request = function() {
+      console.log(this.config);
+    }
+
+    // const axios = new Axios('asdf');
+    // const req = Axios.prototype.request.bind(axios);
+    // req();
+
+    function createInstance(config) {
+      const context = new Axios(config);
+      // const instance = Axios.prototype.request.bind(context);
+      let instance = context.request.bind(context);
+      // console.log('instance', instance);
+      utils.extend(instance, Axios.prototype, context);
+      console.log('createInstance', instance.get, instance.post)
+      return instance;
+      // return context;
+    }
+
+    const ins = createInstance('zxcv');
+    ins();
+    ins.get();
+    for(let key in ins) {
+      console.log(key, ins[key])
+    }
+
+    
+  </script>
+</body>
+</html>

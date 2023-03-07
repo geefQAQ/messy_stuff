@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="test" style="height: 100px; width: 100px; background-color: lightblue"></div>
+</body>
+<script>
+
+  // 共同点
+  // 都可以阻止事件冒泡，父节点无法接受到事件。
+  // 不同点
+  // stopPropagation可以阻止事件冒泡，但不会影响改事件的其他监听方法执行
+  // 而stopImmediatePropagation不仅阻止事件冒泡，还会阻止该事件后面的监听方法执行
+
+  var div = document.querySelector('#test');
+  div.addEventListener('click', function(){
+    console.log('click event 1')
+  });
+  // 添加第二个监听事件，stopPropagation阻止冒泡
+  div.addEventListener('click', function(e){
+    e.stopPropagation();
+    console.log('click event 2')
+  });
+  // 添加第三个监听事件，stopImmediatePropagation阻止冒泡
+  div.addEventListener('click', function(e){
+    e.stopImmediatePropagation();
+    console.log('click event 3')
+  });
+  // 添加第四个监听事件，stopPropagation阻止冒泡
+  div.addEventListener('click', function(e){
+    console.log('click event 4')
+  });
+  // 添加第四个监听事件，stopPropagation阻止冒泡
+  div.addEventListener('click', function(e){
+    console.log('click event 5')
+  });
+
+  // vue实现防重提交？
+  // 1.设置v-throttle自定义指令
+  // Vue.directive('throttle', {
+  //   bind: (el, binding) => {
+  //     let throttleTime = binding.value; // 节流时间
+  //     if (!throttleTime) { // 用户若不设置节流时间，则默认2s
+  //       throttleTime = 2000;
+  //     }
+  //     let cbFun;
+  //     el.addEventListener('click', event => {
+  //       if (!cbFun) { // 第一次执行
+  //         cbFun = setTimeout(() => {
+  //           cbFun = null;
+  //         }, throttleTime);
+  //       } else {
+  //         event && event.stopImmediatePropagation();
+  //       }
+  //     }, true);
+  //   },
+  // });
+  // // 2.为button标签设置v-throttle自定义指令
+  // <button @click="sayHello" v-throttle>提交</button>
+</script>
+</html>

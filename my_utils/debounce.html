@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <input type="text" >
+  <button>提交</button>
+  <button class="btn">提交2</button>
+  <script>
+    function badDebounce(func, wait, immediate) {
+      let timeout, args2, context, timestamp, result
+      const later = function() {
+        // 据上一次触发时间间隔
+        const last = +new Date() - timestamp
+
+        // 上次被包装函数被调用时间间隔 last 小于设定时间间隔 wait
+        if (last < wait && last > 0) {
+          timeout = setTimeout(later, wait - last)
+        } else {
+          timeout = null
+          // 如果设定为immediate===true，因为开始边界已经调用过了此处无需调用
+          if (!immediate) {
+            result = func.apply(context, args2)
+            if (!timeout) {
+              context = args2 = null
+            }
+          }
+        }
+      }
+
+      return function(...args) {
+        args2 = args;
+        console.log('函数')
+        context = this
+        timestamp = +new Date()
+        const callNow = immediate && !timeout
+        // 如果延时不存在，重新设定延时
+        if (!timeout) {
+          timeout = setTimeout(later, wait)
+        }
+        // console.log('timeout', timeout)
+        // if (callNow) {
+        //   result = func.apply(context, args)
+        //   context = args = null
+        // }
+        return result
+      }
+    }
+
+    function simpleDebounce(func, ms) {
+      console.log('func', func)
+      let timeout;
+      return function(...args) {
+        clearTimeout(timeout);
+        console.log('arguments', args)
+        timeout = setTimeout(() => func.apply(this, args), ms)
+      }
+    }
+
+    function debounce(fn, wait) {
+      let timeout, eventTime, context, args;
+      const later = function() {
+        const invokeTime = +new Date();
+        // 上一次的输入到执行函数的时间间隔
+        const lastInterval = invokeTime - eventTime;
+        if (lastInterval < wait && lastInterval > 0) {
+          timeout = setTimeout(later, wait - lastInterval);
+        } else {
+          timeout = null;
+          fn.apply(context, args);
+          args = context = null;
+        }
+      }
+      return function(...originArgs) {
+        args = originArgs;
+        context = this;
+        // 触发事件的时间戳(输入a时的时间戳)
+        eventTime = +new Date();
+        if(!timeout) {
+          timeout = setTimeout(later, wait);
+        }
+      }
+    }
+
+    function throttle(fn, ms) {
+      let isThrottled = false, savedContext, savedArgs;
+      function wrapper(...args) {
+        if(isThrottled) {
+          savedContext = this;
+          savedArgs = args;
+          return;
+        }
+        isThrottled = true;
+        fn.apply(this, args); // 第一次执行
+        setTimeout(() => { // 在执行期间重复执行
+          isThrottled = false;
+          if(savedContext) { // 在执行期间有重复执行的动作
+            wrapper(savedContext, savedArgs);
+            savedContext = saveArgs = null; // 记得清除上下文，否则死循环
+          }
+        }, ms)
+      }
+      return wrapper
+    }
+
+    const input = document.querySelector('input');
+    const button = document.querySelector('button');
+    const test = debounce((v) => {
+      console.log('vvvvv', v.data)
+    }, 1000)
+    input.addEventListener('input', test)
+
+    const submit = throttle(() => {
+      console.log('提交！')
+    }, 1000)
+    button.addEventListener('click', submit)
+
+    const btn2 = document.querySelector('.btn');
+    btn2.addEventListener('click', function() {
+      return;
+      setTimeout(() => {
+        console.log('1111')
+      }, 500)
+    })
+  </script>
+</body>
+</html>
